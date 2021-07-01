@@ -8,6 +8,27 @@ interface Result {
   average: number
 }
 
+interface Argument {
+  target: number,
+  record: Array<number>
+}
+
+const parseArguments = (args: Array<String>): Argument => {
+  if(args.length<4) throw new Error('Not enough arguments');
+  
+  const [ _a, _b, targetValue, ...restValues] = args
+  
+  if(!isNaN(Number(targetValue)) && restValues.map(Number)){
+    return {
+      target: Number(targetValue),
+      record: restValues.map(Number)
+    }
+  }else{
+    throw new Error ('Provided values were not all numbers! Please try again.')
+  }
+
+}
+
 const calculateExercise = (record: Array<number>, target: number): Result => {
   const period_length = record.length;
 
@@ -54,4 +75,9 @@ const calculateExercise = (record: Array<number>, target: number): Result => {
 
 }
 
-console.log(calculateExercise([3, 0, 2, 4.5, 0, 3, 1],2));
+try{
+  const { target, record } = parseArguments(process.argv)
+  console.log(calculateExercise(record,target));
+}catch(e){
+  console.log('Error, something bad happened, error message: ', e.message);
+}
