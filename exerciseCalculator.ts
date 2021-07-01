@@ -3,7 +3,7 @@ interface Result {
   trainingDays: number,
   success: boolean,
   rating: number,
-  ratingDescription: String,
+  ratingDescription: string,
   target: number,
   average: number
 }
@@ -13,21 +13,21 @@ interface Argument {
   record: Array<number>
 }
 
-const parseArguments = (args: Array<String>): Argument => {
+const parseArguments = (args: Array<string>): Argument => {
   if(args.length<4) throw new Error('Not enough arguments');
   
-  const [ _a, _b, targetValue, ...restValues] = args
+  const [ , , targetValue, ...restValues] = args;
   
   if(!isNaN(Number(targetValue)) && restValues.map(Number)){
     return {
       target: Number(targetValue),
       record: restValues.map(Number)
-    }
+    };
   }else{
-    throw new Error ('Provided values were not all numbers! Please try again.')
+    throw new Error ('Provided values were not all numbers! Please try again.');
   }
 
-}
+};
 
 const calculateExercise = (record: Array<number>, target: number): Result => {
   const period_length = record.length;
@@ -37,7 +37,7 @@ const calculateExercise = (record: Array<number>, target: number): Result => {
   const total_value = record.reduce(((sum: number, val: number):number => {
     sum = sum + val;
     return sum;
-  }),0)
+  }),0);
 
   const average = total_value / period_length;
 
@@ -53,7 +53,7 @@ const calculateExercise = (record: Array<number>, target: number): Result => {
     rating = 1;
   }
  
-  let rating_des :String; 
+  let rating_des :string; 
 
   if (rating === 1) {
     rating_des =  "You need to exercise harder";
@@ -73,11 +73,15 @@ const calculateExercise = (record: Array<number>, target: number): Result => {
     average: average
   };
 
-}
+};
 
 try{
-  const { target, record } = parseArguments(process.argv)
+  const { target, record } = parseArguments(process.argv);
   console.log(calculateExercise(record,target));
 }catch(e){
-  console.log('Error, something bad happened, error message: ', e.message);
+  if (e instanceof String){
+    console.log('Error, something bad happened, error message: ', e);
+  }
 }
+
+export default calculateExercise;
