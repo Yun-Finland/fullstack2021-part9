@@ -29,7 +29,7 @@ const parseArguments = (args: Array<string>): Argument => {
 
 };
 
-const calculateExercise = (record: Array<number>, target: number): Result => {
+export const calculateExercise = (record: Array<number>, target: number): Result => {
   const period_length = record.length;
 
   const training_days = record.filter((n:number) => n!==0).length;
