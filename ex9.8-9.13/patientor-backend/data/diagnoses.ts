@@ -1,6 +1,6 @@
 import { DiagnoseEntry } from "../src/types";
 
-const diagnosesData: DiagnoseEntry[] = [
+const data = [
   {
     "code": "M24.2",
     "name": "Disorder of ligament",
@@ -83,5 +83,10 @@ const diagnosesData: DiagnoseEntry[] = [
     "name": "Pneumonia due to coronavirus disease"
   }
 ];
+
+const diagnosesData: DiagnoseEntry[] = data.map(obj => {
+  const object = obj as DiagnoseEntry;
+  return object;
+});
 
 export default diagnosesData;
