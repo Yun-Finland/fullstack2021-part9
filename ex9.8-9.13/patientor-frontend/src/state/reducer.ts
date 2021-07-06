@@ -38,15 +38,18 @@ export const reducer = (state: State, action: Action): State => {
   }
 };
 
-/*
-
 export const setPatientList = (patientListFromApi:Patient[]) =>{
-
-  return dispatch => {
-    dispatch({
-      type:"SET_PATIENT_LIST",
-      payload: patientListFromApi
-    });    
-  };
+  const newAction : Action = ({
+    type: "SET_PATIENT_LIST",
+    payload: patientListFromApi
+  });
+  return newAction;
 };
-*/
+
+export const addPatientList = (newPatient : Patient) => {
+  const newAction : Action = ({
+    type: "ADD_PATIENT",
+    payload: newPatient
+  });
+  return newAction;
+};
