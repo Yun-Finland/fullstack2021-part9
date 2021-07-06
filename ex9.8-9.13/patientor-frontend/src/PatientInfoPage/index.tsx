@@ -1,9 +1,21 @@
 import { useParams  } from "react-router";
-import { Patient } from "../types";
+import { Patient,Gender } from "../types";
 import React from "react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 import { useStateValue } from "../state";
+import { Icon } from 'semantic-ui-react';
+
+const GenderIcon = ({gender}:{gender: Gender})=>{
+  switch(gender){
+    case "male":
+      return <Icon name='mars'/>;
+    case "female":
+      return <Icon name='venus'/>;
+    default:
+      return <Icon name='neuter'/>;
+  }
+};
 
 const PatientInfoPage = () =>{
   const [ {patients},dispatch ] = useStateValue();
@@ -30,7 +42,7 @@ const PatientInfoPage = () =>{
 
   return (
     <div>
-      <h1>{findPatient.name}</h1>
+      <h1>{findPatient.name} <GenderIcon gender = {findPatient.gender}/></h1>
       <p>ssn: {findPatient.ssn}</p>
       <p>occupation: {findPatient.occupation}</p>
     </div>
