@@ -1,6 +1,7 @@
 import { State } from "./state";
 import { Patient } from "../types";
 
+
 export type Action =
   | {
       type: "SET_PATIENT_LIST";
@@ -31,8 +32,21 @@ export const reducer = (state: State, action: Action): State => {
           ...state.patients,
           [action.payload.id]: action.payload
         }
-      };
+      }; 
     default:
       return state;
   }
 };
+
+/*
+
+export const setPatientList = (patientListFromApi:Patient[]) =>{
+
+  return dispatch => {
+    dispatch({
+      type:"SET_PATIENT_LIST",
+      payload: patientListFromApi
+    });    
+  };
+};
+*/
