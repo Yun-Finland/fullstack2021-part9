@@ -1,10 +1,10 @@
 import { useParams  } from "react-router";
-import { Patient,Gender,Entry, Diagnosis } from "../types";
+import { Patient,Gender,Entry, Diagnosis, HealthCheckRating } from "../types";
 import React, { useState } from "react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 import { useStateValue } from "../state";
-import { Icon } from 'semantic-ui-react';
+import { Icon, Message } from 'semantic-ui-react';
 
 const GenderIcon = ({gender}:{gender: Gender})=>{
   switch(gender){
@@ -17,18 +17,53 @@ const GenderIcon = ({gender}:{gender: Gender})=>{
   }
 };
 
-const ShowEntry = ({entry, diagnosesEntry}:{entry:Entry, diagnosesEntry: Diagnosis[] | undefined}) =>{
+const EntryDetails = ({entry, diagnosesEntry}:{entry:Entry, diagnosesEntry: Diagnosis[] | undefined}) =>{
 
   if(!diagnosesEntry){
     return null;
   }
 
-  return(
-    <div>
-      {entry.date} <i>{entry.description}</i>
-      {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnosesEntry.find(n=>n.code === code)?.name}</li>)}
-    </div>
-  );
+  const setIconColor = (rating: HealthCheckRating)=>{
+    switch(rating){
+      case 0:
+        return "green";
+      case 1:
+        return "orange";
+      case 2:
+        return "yellow";
+      default:
+        return "red";
+    }
+  };
+
+  switch(entry.type){
+    case "HealthCheck":
+      return (
+        <Message>
+          <Message.Header>{entry.date} <Icon name='user doctor'/></Message.Header> 
+          <p><i>{entry.description}</i></p>
+          {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnosesEntry.find(n=>n.code === code)?.name}</li>)}
+          <Icon color={setIconColor(entry.healthCheckRating)} name='heart'/>
+        </Message>
+      );
+    case "Hospital":
+      return (
+        <Message>
+          <Message.Header>{entry.date} <Icon name='medkit'/></Message.Header> 
+          <p><i>{entry.description}</i></p>
+          {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnosesEntry.find(n=>n.code === code)?.name}</li>)}
+        </Message>
+      );
+    default:
+      return (
+        <Message>
+          <Message.Header>{entry.date} <Icon name='treatment'/> {entry.employerName}</Message.Header> 
+          <p><i>{entry.description}</i></p>
+          {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnosesEntry.find(n=>n.code === code)?.name}</li>)}
+        </Message>
+      );
+  }
+
 };
 
 const PatientInfoPage = () =>{
@@ -79,7 +114,7 @@ const PatientInfoPage = () =>{
       <p>ssn: {findPatient.ssn}</p>
       <p>occupation: {findPatient.occupation}</p>
       <h3>entries</h3>
-      {(findPatient.entries).map(entry => <ShowEntry key={entry.id} entry={entry} diagnosesEntry = {diagnosesEntry}/>)}
+      {(findPatient.entries).map(entry => <EntryDetails key={entry.id} entry={entry} diagnosesEntry = {diagnosesEntry}/>)}
     </div>
   );
 
