@@ -41,9 +41,8 @@ patientsRouter.post('/', (request, response)=>{
 });
 
 patientsRouter.post('/:id/entries', (request, response)=>{
-  console.log("have you been here");
+
   const patientId = request.params.id;
-  console.log("1. Did you get the id", patientId);
 
   try{
     const newEntry = toNewEntryWithoutId(request.body);
