@@ -1,6 +1,6 @@
 import { useParams  } from "react-router";
-import { Patient,Gender,Entry } from "../types";
-import React from "react";
+import { Patient,Gender,Entry, Diagnosis } from "../types";
+import React, { useState } from "react";
 import axios from "axios";
 import { apiBaseUrl } from "../constants";
 import { useStateValue } from "../state";
@@ -17,17 +17,24 @@ const GenderIcon = ({gender}:{gender: Gender})=>{
   }
 };
 
-const ShowEntry = ({entry}:{entry:Entry}) =>{
+const ShowEntry = ({entry, diagnosesEntry}:{entry:Entry, diagnosesEntry: Diagnosis[] | undefined}) =>{
+
+  if(!diagnosesEntry){
+    return null;
+  }
+
   return(
     <div>
       {entry.date} <i>{entry.description}</i>
-      {entry.diagnosisCodes?.map(code => <li key={code}>{code}</li>)}
+      {entry.diagnosisCodes?.map(code => <li key={code}>{code} {diagnosesEntry.find(n=>n.code === code)?.name}</li>)}
     </div>
   );
 };
 
 const PatientInfoPage = () =>{
   const [ {patients},dispatch ] = useStateValue();
+  const [ diagnosesEntry, setDiagnosesEntry ] = useState<Diagnosis[] | undefined>();
+
   const { id } = useParams<{ id:string}>();
 
   const findPatient = Object.values(patients).find((patient: Patient) => patient.id === id);
@@ -46,7 +53,19 @@ const PatientInfoPage = () =>{
       };
       void data();
     }catch(e){
-      console.log("Cannot find the ssn of the patient!");
+      console.log("Cannot find the ssn info of the patient!");
+    }
+  }
+
+  if(!diagnosesEntry){
+    try{
+      const getData = async() => {
+        const returnedData = await axios.get<Diagnosis[]>(`${apiBaseUrl}/diagnoses`);
+        setDiagnosesEntry(returnedData.data);
+      };
+      void getData();
+    }catch(e){
+      console.log("Cannot find diagnoses data!");
     }
   }
 
@@ -60,7 +79,7 @@ const PatientInfoPage = () =>{
       <p>ssn: {findPatient.ssn}</p>
       <p>occupation: {findPatient.occupation}</p>
       <h3>entries</h3>
-      {(findPatient.entries).map(entry => <ShowEntry key={entry.id} entry={entry}/>)}
+      {(findPatient.entries).map(entry => <ShowEntry key={entry.id} entry={entry} diagnosesEntry = {diagnosesEntry}/>)}
     </div>
   );
 
