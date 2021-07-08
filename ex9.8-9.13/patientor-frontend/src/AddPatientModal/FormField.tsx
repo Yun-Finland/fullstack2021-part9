@@ -1,7 +1,7 @@
 import React from "react";
-import { ErrorMessage, Field, FieldProps, FormikProps } from "formik";
-import { Dropdown, DropdownProps, Form } from "semantic-ui-react";
-import { Diagnosis, Gender } from "../types";
+import { ErrorMessage, Field, FieldProps } from "formik";
+import { Form } from "semantic-ui-react";
+import { Gender } from "../types";
 
 // structure of a single option
 export type GenderOption = {
@@ -73,6 +73,7 @@ export const NumberField = ({ field, label, min, max } : NumberProps ) => (
   </Form.Field>
 );
 
+/*
 export const DiagnosisSelection = ({
   diagnoses,
   setFieldValue,
@@ -112,3 +113,4 @@ export const DiagnosisSelection = ({
     </Form.Field>
   );
 };
+*/

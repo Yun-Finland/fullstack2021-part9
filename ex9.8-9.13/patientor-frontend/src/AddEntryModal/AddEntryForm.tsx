@@ -2,86 +2,99 @@ import React from "react";
 import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 
-import { TextField, SelectField, GenderOption } from "./FormField";
-import { Gender, Patient } from "../types";
+import { TextField, DiagnosisSelection, NumberField } from "./EntryFormField";
+import { HealthCheckEntry,HealthCheckRating, HospitalEntry, OccupationalHealthCareEntry } from "../types";
+import { useStateValue } from "../state";
 
-/*
- * use type Patient, but omit id and entries,
- * because those are irrelevant for new patient object.
- */
-export type PatientFormValues = Omit<Patient, "id" | "entries">;
-
-interface Props {
-  onSubmit: (values: PatientFormValues) => void;
+interface HospitalProps {
+  onSubmit: (values: Omit<HospitalEntry,"id">) => void;
   onCancel: () => void;
 }
 
-const genderOptions: GenderOption[] = [
-  { value: Gender.Male, label: "Male" },
-  { value: Gender.Female, label: "Female" },
-  { value: Gender.Other, label: "Other" }
-];
+const CommonBaseField =()=> {
+  return (
+    <div>
+      <Field
+      label="Date"
+      placeholder="YYYY-MM-DD"
+      name="date"
+      component={TextField}
+    />
+    <Field
+      label="Specialist"
+      placeholder="Specialist"
+      name="specialist"
+      component={TextField}
+    />
+    <Field
+      label="Description"
+      placeholder="Description"
+      name="description"
+      component={TextField}
+    />         
+  </div>
+  );
+};
 
-export const AddPatientForm = ({ onSubmit, onCancel } : Props ) => {
+export const AddHospitalForm = ({ onSubmit, onCancel } : HospitalProps ) => {
+  const [{ diagnoses },] = useStateValue();
+
+  if(!diagnoses){
+    return null;
+  }
+
   return (
     <Formik
       initialValues={{
-        name: "",
-        ssn: "",
-        dateOfBirth: "",
-        occupation: "",
-        gender: Gender.Other
+        type: 'Hospital',
+        date: "",
+        specialist: "",
+        description: "",
+        diagnosisCodes: [],
+        discharge: {
+          date: "",
+          criteria: ""
+        }
       }}
       onSubmit={onSubmit}
       validate={values => {
         const requiredError = "Field is required";
         const errors: { [field: string]: string } = {};
-        if (!values.name) {
-          errors.name = requiredError;
+        if (!values.date) {
+          errors.date = requiredError;
         }
-        if (!values.ssn) {
-          errors.ssn = requiredError;
+        if (!values.specialist) {
+          errors.specialist = requiredError;
         }
-        if (!values.dateOfBirth) {
-          errors.dateOfBirth = requiredError;
+        if (!values.description) {
+          errors.description = requiredError;
         }
-        if (!values.occupation) {
-          errors.occupation = requiredError;
+        if (!values.discharge.date || !values.discharge.criteria ) {
+          errors.discharge = requiredError;
         }
         return errors;
       }}
     >
-      {({ isValid, dirty }) => {
+      {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
         return (
           <Form className="form ui">
+            <CommonBaseField />
+            <DiagnosisSelection
+              diagnoses={Object.values(diagnoses)}
+              setFieldValue = {setFieldValue}
+              setFieldTouched = {setFieldTouched}
+            /> 
             <Field
-              label="Name"
-              placeholder="Name"
-              name="name"
-              component={TextField}
-            />
-            <Field
-              label="Social Security Number"
-              placeholder="SSN"
-              name="ssn"
-              component={TextField}
-            />
-            <Field
-              label="Date Of Birth"
+              label="Discharge"
               placeholder="YYYY-MM-DD"
-              name="dateOfBirth"
+              name="discharge.date"
               component={TextField}
             />
             <Field
-              label="Occupation"
-              placeholder="Occupation"
-              name="occupation"
+              rows={2}
+              placeholder="Criteria"
+              name="discharge.criteria"
               component={TextField}
-            />
-            <SelectField
-              label="Gender"
-              name="gender"
-              options={genderOptions}
             />
             <Grid>
               <Grid.Column floated="left" width={5}>
@@ -107,4 +120,174 @@ export const AddPatientForm = ({ onSubmit, onCancel } : Props ) => {
   );
 };
 
-export default AddPatientForm;
+interface HealthCheckProps {
+  onSubmit: (values: Omit<HealthCheckEntry,"id">) => void;
+  onCancel: () => void;
+}
+
+export const AddHealthCheckForm = ({ onSubmit, onCancel } : HealthCheckProps ) => {
+  const [{ diagnoses },] = useStateValue();
+  if(!diagnoses){
+    return null;
+  }
+
+  return (
+    <Formik
+      initialValues={{
+        type: 'HealthCheck',
+        date: "",
+        specialist: "",
+        description: "",
+        diagnosisCodes: [],
+        healthCheckRating: HealthCheckRating.LowRisk
+      }}
+      onSubmit={onSubmit}
+      validate={values => {
+        const requiredError = "Field is required";
+        const errors: { [field: string]: string } = {};
+        if (!values.date) {
+          errors.date = requiredError;
+        }
+        if (!values.specialist) {
+          errors.specialist = requiredError;
+        }
+        if (!values.description) {
+          errors.description = requiredError;
+        }
+        return errors;
+      }}
+    >
+      {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+        return (
+          <Form className="form ui">
+            <CommonBaseField />      
+            <DiagnosisSelection
+              diagnoses={Object.values(diagnoses)}
+              setFieldValue = {setFieldValue}
+              setFieldTouched = {setFieldTouched}
+            />
+            <Field
+              label="HealthCheckRating"
+              name="healthCheckRating"
+              component={NumberField}
+              min={0}
+              max={3}
+            />
+            <Grid>
+              <Grid.Column floated="left" width={5}>
+                <Button type="button" onClick={onCancel} color="red">
+                  Cancel
+                </Button>
+              </Grid.Column>
+              <Grid.Column floated="right" width={5}>
+                <Button
+                  type="submit"
+                  floated="right"
+                  color="green"
+                  disabled={!dirty || !isValid}
+                >
+                  Add
+                </Button>
+              </Grid.Column>
+            </Grid>
+          </Form>
+        );
+      }}
+    </Formik>
+  );
+};
+
+interface OccupationProps {
+  onSubmit: (values: Omit<OccupationalHealthCareEntry,"id">) => void;
+  onCancel: () => void;
+}
+
+export const AddOccupationalForm = ({ onSubmit, onCancel } : OccupationProps ) => {
+  const [{ diagnoses },] = useStateValue();
+  if(!diagnoses){
+    return null;
+  }
+
+  return (
+    <Formik
+      initialValues={{
+        type: 'OccupationalHealthcare',
+        date: "",
+        specialist: "",
+        description: "",
+        diagnosisCodes: [],
+        employerName:"",
+        sickLeave: {
+          startDate: "",
+          endDate: ""
+        }
+      }}
+      onSubmit={onSubmit}
+      validate={values => {
+        const requiredError = "Field is required";
+        const errors: { [field: string]: string } = {};
+        if (!values.date) {
+          errors.date = requiredError;
+        }
+        if (!values.specialist) {
+          errors.specialist = requiredError;
+        }
+        if (!values.description) {
+          errors.description = requiredError;
+        }
+        if (!values.employerName) {
+          errors.employerName = requiredError;
+        }
+        return errors;
+      }}
+    >
+      {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+        return (
+          <Form className="form ui">
+            <CommonBaseField />
+            <DiagnosisSelection
+              diagnoses={Object.values(diagnoses)}
+              setFieldValue = {setFieldValue}
+              setFieldTouched = {setFieldTouched}
+            />            
+            <Field
+              label="EmployerName"
+              placeholder="EmployerName"
+              name="employerName"
+              component={TextField}
+            />      
+            <Field
+              label="SickLeave"
+              placeholder="YYYY-MM-DD"
+              name="sickLeave.startDate"
+              component={TextField}
+            />
+            <Field
+              rows={2}
+              placeholder="YYYY-MM-DD"
+              name="sickLeave.endDate"
+              component={TextField}
+            /> 
+            <Grid>
+              <Grid.Column floated="left" width={5}>
+                <Button type="button" onClick={onCancel} color="red">
+                  Cancel
+                </Button>
+              </Grid.Column>
+              <Grid.Column floated="right" width={5}>
+                <Button
+                  type="submit"
+                  floated="right"
+                  color="green"
+                  disabled={!dirty || !isValid}
+                >
+                  Add
+                </Button>
+              </Grid.Column>
+            </Grid>
+          </Form>
+        );
+      }}
+    </Formik>
+  );
+};

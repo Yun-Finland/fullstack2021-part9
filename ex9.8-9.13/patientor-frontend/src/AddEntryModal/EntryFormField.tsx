@@ -1,38 +1,28 @@
+import { Diagnosis } from "../types";
 import React from "react";
 import { ErrorMessage, Field, FieldProps, FormikProps } from "formik";
 import { Dropdown, DropdownProps, Form } from "semantic-ui-react";
-import { Diagnosis, Gender } from "../types";
 
-// structure of a single option
-export type GenderOption = {
-  value: Gender;
+// Place for number insert with ranges
+interface NumberProps extends FieldProps {
   label: string;
-};
+  errorMessage?: string;
+  min: number;
+  max: number;
+}
 
-// props for select field component
-type SelectFieldProps = {
-  name: string;
-  label: string;
-  options: GenderOption[];
-};
-
-export const SelectField = ({
-  name,
-  label,
-  options
-}: SelectFieldProps) => (
+export const NumberField = ({ field, label, min, max } : NumberProps ) => (
   <Form.Field>
     <label>{label}</label>
-    <Field as="select" name={name} className="ui dropdown">
-      {options.map(option => (
-        <option key={option.value} value={option.value}>
-          {option.label || option.value}
-        </option>
-      ))}
-    </Field>
+    <Field {...field} type='number' min={min} max={max} />
+
+    <div style={{ color:'red' }}>
+      <ErrorMessage name={field.name} />
+    </div>
   </Form.Field>
 );
 
+// Place for text input cell
 interface TextProps extends FieldProps {
   label: string;
   placeholder: string;
@@ -52,27 +42,7 @@ export const TextField= ({
   </Form.Field>
 );
 
-/*
-  for exercises 9.24.-
-*/
-interface NumberProps extends FieldProps {
-  label: string;
-  errorMessage?: string;
-  min: number;
-  max: number;
-}
-
-export const NumberField = ({ field, label, min, max } : NumberProps ) => (
-  <Form.Field>
-    <label>{label}</label>
-    <Field {...field} type='number' min={min} max={max} />
-
-    <div style={{ color:'red' }}>
-      <ErrorMessage name={field.name} />
-    </div>
-  </Form.Field>
-);
-
+// For diagnosis Selection Cell
 export const DiagnosisSelection = ({
   diagnoses,
   setFieldValue,
@@ -112,3 +82,4 @@ export const DiagnosisSelection = ({
     </Form.Field>
   );
 };
+
