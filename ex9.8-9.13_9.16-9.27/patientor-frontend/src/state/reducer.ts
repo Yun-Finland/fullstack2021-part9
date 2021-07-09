@@ -1,7 +1,6 @@
 import { State } from "./state";
 import { Diagnosis, Patient } from "../types";
 
-
 export type Action =
   | {
       type: "SET_PATIENT_LIST";

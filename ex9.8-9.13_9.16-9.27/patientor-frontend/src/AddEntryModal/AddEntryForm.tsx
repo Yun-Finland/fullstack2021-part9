@@ -1,6 +1,6 @@
 import React from "react";
 import { Grid, Button } from "semantic-ui-react";
-import { Field, Formik, Form } from "formik";
+import { Field, FormikProps,Formik, Form } from "formik";
 
 import { TextField, DiagnosisSelection, NumberField } from "./EntryFormField";
 import { HealthCheckEntry,HealthCheckRating, HospitalEntry, OccupationalHealthCareEntry } from "../types";
@@ -11,7 +11,15 @@ interface HospitalProps {
   onCancel: () => void;
 }
 
-const CommonBaseField =()=> {
+const CommonBaseField =({
+  setFieldValue,
+  setFieldTouched
+}: {
+  setFieldValue: FormikProps<{ diagnosisCodes: string[] }>["setFieldValue"];
+  setFieldTouched: FormikProps<{ diagnosisCodes: string[] }>["setFieldTouched"];
+})=> {
+  const [{ diagnoses },] = useStateValue();
+
   return (
     <div>
       <Field
@@ -31,17 +39,17 @@ const CommonBaseField =()=> {
       placeholder="Description"
       name="description"
       component={TextField}
-    />         
+    />
+    <DiagnosisSelection
+      diagnoses={Object.values(diagnoses)}
+      setFieldValue = {setFieldValue}
+      setFieldTouched = {setFieldTouched}
+    />          
   </div>
   );
 };
 
 export const AddHospitalForm = ({ onSubmit, onCancel } : HospitalProps ) => {
-  const [{ diagnoses },] = useStateValue();
-
-  if(!diagnoses){
-    return null;
-  }
 
   return (
     <Formik
@@ -78,12 +86,10 @@ export const AddHospitalForm = ({ onSubmit, onCancel } : HospitalProps ) => {
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
         return (
           <Form className="form ui">
-            <CommonBaseField />
-            <DiagnosisSelection
-              diagnoses={Object.values(diagnoses)}
+            <CommonBaseField               
               setFieldValue = {setFieldValue}
               setFieldTouched = {setFieldTouched}
-            /> 
+            />
             <Field
               label="Discharge"
               placeholder="YYYY-MM-DD"
@@ -126,10 +132,6 @@ interface HealthCheckProps {
 }
 
 export const AddHealthCheckForm = ({ onSubmit, onCancel } : HealthCheckProps ) => {
-  const [{ diagnoses },] = useStateValue();
-  if(!diagnoses){
-    return null;
-  }
 
   return (
     <Formik
@@ -160,9 +162,7 @@ export const AddHealthCheckForm = ({ onSubmit, onCancel } : HealthCheckProps ) =
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
         return (
           <Form className="form ui">
-            <CommonBaseField />      
-            <DiagnosisSelection
-              diagnoses={Object.values(diagnoses)}
+            <CommonBaseField               
               setFieldValue = {setFieldValue}
               setFieldTouched = {setFieldTouched}
             />
@@ -203,10 +203,6 @@ interface OccupationProps {
 }
 
 export const AddOccupationalForm = ({ onSubmit, onCancel } : OccupationProps ) => {
-  const [{ diagnoses },] = useStateValue();
-  if(!diagnoses){
-    return null;
-  }
 
   return (
     <Formik
@@ -244,12 +240,10 @@ export const AddOccupationalForm = ({ onSubmit, onCancel } : OccupationProps ) =
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
         return (
           <Form className="form ui">
-            <CommonBaseField />
-            <DiagnosisSelection
-              diagnoses={Object.values(diagnoses)}
+            <CommonBaseField               
               setFieldValue = {setFieldValue}
               setFieldTouched = {setFieldTouched}
-            />            
+            />         
             <Field
               label="EmployerName"
               placeholder="EmployerName"
@@ -291,3 +285,4 @@ export const AddOccupationalForm = ({ onSubmit, onCancel } : OccupationProps ) =
     </Formik>
   );
 };
+

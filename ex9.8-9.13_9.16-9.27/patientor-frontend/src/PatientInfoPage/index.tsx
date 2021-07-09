@@ -20,7 +20,7 @@ const GenderIcon = ({gender}:{gender: Gender})=>{
 };
 
 const PatientInfoPage = () =>{
-  const [ {patients, }, dispatch ] = useStateValue();
+  const [ {patients}, dispatch ] = useStateValue();
  
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | undefined>();
@@ -41,13 +41,13 @@ const PatientInfoPage = () =>{
 
   if(!findPatient.ssn || !findPatient.entries){ 
     try{
-      const data = async() => {
+      const getData = async() => {
         const response = await axios.get<Patient>(`${apiBaseUrl}/patients/${id}`);
         findPatient.ssn = response.data.ssn;
         findPatient.entries = response.data.entries;
-        dispatch({ type: "ADD_PATIENT", payload: findPatient });
+        dispatch(addPatientList(findPatient));
       };
-      void data();
+      void getData();
     }catch(e){
       console.log("Cannot find the ssn or entries info of the patient!");
     }
